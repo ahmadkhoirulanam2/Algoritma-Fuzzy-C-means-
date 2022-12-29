@@ -1,6 +1,6 @@
 ---
-title: "My Document"
-author: "Deden Istiawan-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
+title: "Algoritma Fuzzy C-Means"
+author: "Ahmad Khoirul Anam-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -23,11 +23,41 @@ text-align: justify}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-#Algoritma 
+# Algoritma 
+Fuzzy C-Means (FCM) merupakan cara kerjanya
+menggunakan medote Hard K-Means.
 
-#Tahapan Algoritma
+Fuzzy C-Means (FCM) juga mengunakan metode
+pengelompokan data.
 
-#Eksperiman Algoritma
+Cluster terbentuk derajat atau tingkat anggotanya yang
+berbeda antara 0 hingga 1
+
+# Tahapan Algoritma
+
+1. Input Data terlebih dahulu
+
+2. Inisialisasi menentukan
+-Jumlah Cluster(c)
+-Error terkecil yang diharapkan
+-Bobot pangkat (w)
+-Iterasi awal
+
+3. Inisiasikan matriks Pseudo-Partition
+-> Memberikan nirai random pada matriks Fuzzy Pseudo partition dengan syarat antara u (u1), i (u2), dan u (u3) berjumlah satu, ∑uji = 1
+
+4. Pengulangan
+-> Langkah-langkah :
+u1*(a1), u1*(a2), u1*(a3), u1*(a4), u1*(a5)
+u2*(a1), u2*(a2), u2*(a3), u2*(a4), u2*(a5)
+
+Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, maka pengulangan langkah ini masih berlanjut.
+
+5. Hitunglah nilai centroid dari masih – masih Cluster
+
+6. Hitunglah Kembali matriks Fuzzy pseudo – partition matriks partisi
+
+# Eksperiman Algoritma
 
 # Referensi
 
