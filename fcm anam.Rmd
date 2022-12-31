@@ -35,29 +35,51 @@ berbeda antara 0 hingga 1
 
 # Tahapan Algoritma
 
-1. Input Data terlebih dahulu
+1. Input Data terlebih dahulu.
 
-2. Inisialisasi menentukan
--Jumlah Cluster(c)
--Error terkecil yang diharapkan
--Bobot pangkat (w)
--Iterasi awal
+2. Inisialisasi menentukan :
+-Jumlah Cluster(c),
+-Error terkecil yang diharapkan,
+-Bobot pangkat (w),
+-Iterasi awal,
 
 3. Inisiasikan matriks Pseudo-Partition
--> Memberikan nirai random pada matriks Fuzzy Pseudo partition dengan syarat antara u (u1), i (u2), dan u (u3) berjumlah satu, ∑uji = 1
+-> Memberikan nirai random pada matriks Fuzzy Pseudo partition dengan syarat antara u (u1), i (u2), dan u (u3) berjumlah satu, ∑uji = 1.
 
 4. Pengulangan
 -> Langkah-langkah :
-u1*(a1), u1*(a2), u1*(a3), u1*(a4), u1*(a5)
-u2*(a1), u2*(a2), u2*(a3), u2*(a4), u2*(a5)
-
+u1*(a1),  u1*(a2),  u1*(a3),  u1*(a4),  u1*(a5)
+ u2*(a1),  u2*(a2),  u2*(a3),  u2*(a4),  u2*(a5).
 Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, maka pengulangan langkah ini masih berlanjut.
 
-5. Hitunglah nilai centroid dari masih – masih Cluster
+5. Hitunglah nilai centroid dari masih – masih Cluster.
 
-6. Hitunglah Kembali matriks Fuzzy pseudo – partition matriks partisi
+6. Hitunglah Kembali matriks Fuzzy pseudo – partition matriks partisi.
+
 
 # Eksperiman Algoritma
+
+# Analisis Kluster Pemartisian Menggunakan Fuzzy C-Means
+1.1 Menampilkan atau menjalankan perintah 'ppclust' analisi C-Means
+```{r}
+library(ppclust)
+```
+
+1.2 Memanggil data yang dibutuhkan
+Memanggil hasil pengelompokan, dalam kelompok ini menggunakan fungsi dari fungsi analisis kluster seperti 'cluster', 'fclust' dan 'factoextra'.Maka dapat dilihat sebagai berikut:
+```{r}
+library(factoextra)
+library(cluster)
+library(fclust)
+```
+
+1.3 Menampilan dataset
+```{r}
+data(iris)
+x=iris[,-5]
+x
+```
+
 
 # Referensi
 
