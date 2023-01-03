@@ -38,10 +38,10 @@ berbeda antara 0 hingga 1
 1. Input Data terlebih dahulu.
 
 2. Inisialisasi menentukan :
--Jumlah Cluster(c),
--Error terkecil yang diharapkan,
--Bobot pangkat (w),
--Iterasi awal,
+ -Jumlah Cluster(c),
+ -Error terkecil yang diharapkan,
+ -Bobot pangkat (w),
+ -Iterasi awal.
 
 3. Inisiasikan matriks Pseudo-Partition
 -> Memberikan nirai random pada matriks Fuzzy Pseudo partition dengan syarat antara u (u1), i (u2), dan u (u3) berjumlah satu, ∑uji = 1.
@@ -57,15 +57,18 @@ Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, ma
 6. Hitunglah Kembali matriks Fuzzy pseudo – partition matriks partisi.
 
 
-# Eksperiman Algoritma
+#  Eksperiman Algoritma
 
-# Analisis Kluster Pemartisian Menggunakan Fuzzy C-Means
+# 1. Analisis Kluster Pemartisian Menggunakan Fuzzy C-Means
+
 1.1 Menampilkan atau menjalankan perintah 'ppclust' analisi C-Means
+
 ```{r}
 library(ppclust)
 ```
 
-1.2 Memanggil data yang dibutuhkan
+1.2 Memanggil data yang dibutuhkan 
+
 Memanggil hasil pengelompokan, dalam kelompok ini menggunakan fungsi dari fungsi analisis kluster seperti 'cluster', 'fclust' dan 'factoextra'.Maka dapat dilihat sebagai berikut:
 ```{r}
 library(factoextra)
@@ -74,11 +77,111 @@ library(fclust)
 ```
 
 1.3 Menampilan dataset
+
+Kami menampilkan data FCm dari dataset Iris. Inilah data Iris nyata dari empat fitur diantaranya adalah (Sepal.Length, Sepal.Width, Petal.Length dan Petal.Width) dari 150 bunga iris dengan tiga spesies (di kolom terakhir sebagai variabel kelas). Kumpulan empat data diatas berisi 50 sampel yang masing-masing sampel terdiri dari tiga spesies iris. Salah satu dari tiga cluster alami ini (Kelas 1) secara linier terpisah dengan baik dari dua cluster lainnya, sedangkan Kelas 2 dan 3 memiliki beberapa tumpang tindih seperti yang terlihat pada plot di bawah ini.
+
 ```{r}
 data(iris)
 x=iris[,-5]
 x
 ```
+
+
+
+
+
+Plot data FCM berdasarkan kelas spesies iris
+```{r}
+pairs(x, col=iris[,5])
+```
+
+
+## 2 PENGELOMPOKAN C-MEANS FUZZY
+Fuzzy C-Means (FCM) adalah algoritma soft custering yang diusulkan oleh Bezdek (1974; 1981). Tidak seperti algoritma K-means di mana setiap objek data adalah anggota dari hanya satu cluster, objek data adalah anggota dari semua cluster dengan berbagai tingkat anggota fuzzy antara 0 dan 1 di FCM. Oleh karena itu, objek data yang lebih dekat ke pusat cluster memiliki tingkat keanggotaan yang lebih tinggi daripada objek yang tersebar di perbatasan cluster.
+
+## 2.1 Jalankan FCM dengan Single Start
+
+## 2.1.1 Inisialisasi
+Untuk memulai FCM serta algoritme pengoptimalan bergantian lainnya, diperlukan langkah inisialisasi untuk membangun matriks prototipe cluster awal dan matriks derajat keanggotaan fuzzy. Meskipun tugas ini biasanya dilakukan pada langkah inisialisasi dari algoritma pengelompokan, prototipe awal dan keanggotaan juga dapat langsung diinput oleh pengguna.
+
+FCM biasanya dimulai dengan menggunakan bilangan bulat yang menentukan jumlah cluster. Dalam hal ini, matriks prototipe dihasilkan secara internal dengan menggunakan salah satu dari algoritma inisialisasi prototipe yang termasuk dalam paket 'inaparc'. Teknik inisialisasi default adalah K-means++ dengan versi fungsi FCM saat ini dalam paket ini. Dalam blok kode berikut, FCM berjalan untuk tiga klaster dengan nilai default dari argumen yang tersisa.
+
+```{r}
+res.fcm <- fcm(x, centers=3)
+```
+
+Meskipun ini adalah cara biasa untuk menjalankan FCM dengan jumlah cluster yang telah ditentukan sebelumnya, kadang-kadang pengguna mungkin ingin menggunakan matriks prototipe cluster tertentu untuk memulai algoritma. Dalam hal ini, FCM menggunakan matriks prototipe yang ditentukan pengguna alih-alih yang dihasilkan secara internal sebagai berikut:
+
+```{r}
+v0 <- matrix(nrow=3, ncol=4,
+     c(5.0, 3.4, 1.4, 0.3,
+       6.7, 3.0, 5.6, 2.1,
+       5.8, 2.7, 4.3, 1.4),
+       byrow=TRUE)
+print(v0)
+```
+
+
+```{r}
+res.fcm <- fcm(x, centers=v0)
+```
+
+
+Dalam blok kode berikut, ada contoh lain untuk inisialisasi prototipe cluster untuk tiga cluster. v, matriks prototipe cluster diinisialisasi dengan menggunakan algoritma initalisasi K-means++ (kmpp) dalam paket R 'inaparc'.
+
+
+
+```{r}
+v0 <- inaparc::kmpp(x, k=3)$v
+print(v0)
+```
+
+
+
+
+```{r}
+res.fcm <- fcm(x, centers=v0)
+```
+
+
+Dan masih ada banyak lagi teknik lain untuk inisialisasi matriks prototipe cluster dalam paket R 'inaparc'. Lihat dokumentasi paket untuk alternatif lain.
+
+
+
+FCM dapat dimulai dengan matriks gelar keanggotaan yang ditentukan pengguna. Dalam hal ini, fungsi FCM dipanggil dengan keanggotaan argumen sebagai berikut:
+
+
+```{r}
+u0 <- inaparc::imembrand(nrow(x), k=3)$u
+res.fcm <- fcm(x, centers=3, memberships=u0
+```
+
+
+Untuk menghasilkan matriks prototipe cluster dan gelar keanggotaan, pengguna dapat memilih salah satu algoritma inisialisasi yang ada dalam paket R 'inaparc'. Untuk tujuan ini, alginitv dan alginitu dapat disedot untuk prototipe cluster dan gelar keanggotaan, masing-masing.
+
+
+```{r}
+res.fcm <- fcm(x, centers=3, alginitv="hartiganwong", alginitu="imembrand")
+```
+
+
+Secara umum, metrik jarak Euclidean kuadrat digunakan dengan FCM untuk menghitung jarak antara pusat kluster dan objek data. Pengguna dapat menentukan metrik jarak lainnya dengan argumen dmetric sebagai berikut:
+
+```{r}
+res.fcm <- fcm(x, centers=3, dmetric="correlation")
+```
+
+
+
+Meskipun argumen m, eksponen fuzzy biasanya dipilih sebagai 2 di sebagian besar aplikasi yang menggunakan FCM, pengguna dapat meningkatkan m untuk mendapatkan hasil yang lebih kabur sebagai berikut:
+
+
+```{r}
+res.fcm <- fcm(x, centers=3, m=4)
+```
+
+Ada argumen input lain yang tersedia dengan fungsi fcm untuk mengontrol jalannya algoritm FCM. Untuk detailnya, lihat fcm di manual paket ppclust.
+
 
 
 # Referensi
