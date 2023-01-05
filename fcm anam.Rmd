@@ -65,6 +65,7 @@ Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, ma
 
 ```{r}
 library(ppclust)
+library (readr)
 ```
 
 ## 1.1.2 Memanggil data yang dibutuhkan 
@@ -76,6 +77,9 @@ library(factoextra)
 library(cluster)
 library(fclust)
 library(ggplot2)
+library (readr)
+library (readr)
+urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
 ```
 
 
@@ -84,18 +88,17 @@ library(ggplot2)
 Kami menampilkan data FCm dari dataset Iris. Inilah data Iris nyata dari empat fitur diantaranya adalah (Sepal.Length, Sepal.Width, Petal.Length dan Petal.Width) dari 150 bunga iris dengan tiga spesies (di kolom terakhir sebagai variabel kelas). Kumpulan empat data diatas berisi 50 sampel yang masing-masing sampel terdiri dari tiga spesies iris. Salah satu dari tiga cluster alami ini (Kelas 1) secara linier terpisah dengan baik dari dua cluster lainnya, sedangkan Kelas 2 dan 3 memiliki beberapa tumpang tindih seperti yang terlihat pada plot di bawah ini.
 
 ```{r}
-data(iris)
-x=iris[,-5]
-x
+data<-read.csv(url(urlfile), row.names = "Kabupaten")
+data
 ```
 
 
 
 
 
-Plot data FCM berdasarkan kelas spesies iris
+Mengecek data missing
 ```{r}
-pairs(x, col=iris[,5])
+colSums(is.na(data))
 ```
 
 
@@ -111,7 +114,11 @@ FCM biasanya dimulai dengan menggunakan bilangan bulat yang menentukan jumlah cl
 
 
 ```{r}
-res.fcm <- fcm(x, centers=3)
+#Plot Disatance
+library(ggplot2)
+library(factoextra)
+distance <- get_dist(data)
+fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"))
 ```
 
 
@@ -119,17 +126,17 @@ res.fcm <- fcm(x, centers=3)
 Meskipun ini adalah cara biasa untuk menjalankan FCM dengan jumlah cluster yang telah ditentukan sebelumnya, kadang-kadang pengguna mungkin ingin menggunakan matriks prototipe cluster tertentu untuk memulai algoritma. Dalam hal ini, FCM menggunakan matriks prototipe yang ditentukan pengguna alih-alih yang dihasilkan secara internal sebagai berikut:
 
 ```{r}
-v0 <- matrix(nrow=3, ncol=4,
-     c(5.0, 3.4, 1.4, 0.3,
-       6.7, 3.0, 5.6, 2.1,
-       5.8, 2.7, 4.3, 1.4),
-       byrow=TRUE)
-print(v0)
+#use several different values of k
+k2 <- kmeans(data, centers = 2, nstart = 25)
+k3 <- kmeans(data, centers = 3, nstart = 25)
+k4 <- kmeans(data, centers = 4, nstart = 25)
+k5 <- kmeans(data, centers = 5, nstart = 25) 
 ```
 
 
 ```{r}
-res.fcm <- fcm(x, centers=v0)
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, p5 nrow = 1)
 ```
 
 
@@ -138,7 +145,7 @@ Dalam blok kode berikut, ada contoh lain untuk inisialisasi prototipe cluster un
 
 
 ```{r}
-v0 <- inaparc::kmpp(x, k=3)$v
+v0 <- inaparc::kmpp(data, k=3)$v
 print(v0)
 ```
 
@@ -146,7 +153,7 @@ print(v0)
 
 
 ```{r}
-res.fcm <- fcm(x, centers=v0)
+res.fcm <- fcm(data, centers=v0)
 ```
 
 
@@ -158,7 +165,7 @@ FCM dapat dimulai dengan matriks gelar keanggotaan yang ditentukan pengguna. Dal
 
 ```{r}
 u0 <- inaparc::imembrand(nrow(x), k=3)$u
-res.fcm <- fcm(x, centers=3, memberships=u0)
+res.fcm <- fcm(data, centers=3, memberships=u0)
 ```
 
 
@@ -167,14 +174,14 @@ Untuk menghasilkan matriks prototipe cluster dan gelar keanggotaan, pengguna dap
 
 
 ```{r}
-res.fcm <- fcm(x, centers = 3, alginitv = "hartiganwong", alginitu = "imembrand") 
+res.fcm <- fcm(data, centers = 3, alginitv = "hartiganwong", alginitu = "imembrand") 
 ```
 
 
 Secara umum, metrik jarak Euclidean kuadrat digunakan dengan FCM untuk menghitung jarak antara pusat kluster dan objek data. Pengguna dapat menentukan metrik jarak lainnya dengan argumen dmetric sebagai berikut:
 
 ```{r}
-res.fcm <- fcm(x, centers=3, dmetric="correlation")
+res.fcm <- fcm(data, centers=3, dmetric="correlation")
 ```
 
 
@@ -183,7 +190,7 @@ Meskipun argumen m, eksponen fuzzy biasanya dipilih sebagai 2 di sebagian besar 
 
 
 ```{r}
-res.fcm <- fcm(x, centers = 3, m = 4)
+res.fcm <- fcm(data, centers = 3, m = 4)
 ```
 
 Ada argumen input lain yang tersedia dengan fungsi fcm untuk mengontrol jalannya algoritm FCM. Untuk detailnya, lihat fcm di manual paket ppclust.
@@ -196,7 +203,7 @@ Ada argumen input lain yang tersedia dengan fungsi fcm untuk mengontrol jalannya
 Matriks derajat keanggotaan fuzzy adalah output utama dari fungsi fcm.
 
 ```{r}
-res.fcm <- fcm(x, centers=3)
+res.fcm <- fcm(data, centers=3)
 as.data.frame(res.fcm$u)
 ```
 
@@ -233,7 +240,7 @@ res.fcm$comp.time
 Untuk menemukan solusi optimal, fungsi FCM dapat dimulai beberapa kali. Seperti yang terlihat dalam potongan kode berikut, argumen nstart digunakan untuk tujuan ini.
 
 ```{r}
-res.fcm <- fcm(x, centers=3, nstart=5)
+res.fcm <- fcm(data, centers=3, nstart=5)
 ```
 
 
@@ -241,7 +248,7 @@ Ketika beberapa awal dilakukan, baik prototipe cluster awal atau derajat keanggo
 
 
 ```{r}
-res.fcm <- fcm(x, centers=3, nstart=5, fixmemb=TRUE)
+res.fcm <- fcm(data, centers=3, nstart=5, fixmemb=TRUE)
 ```
 
 Dari  data diatas, baik prototipe dan keanggotaan tidak dapat diperbaiki secara bersamaan.
@@ -303,7 +310,7 @@ Ada beberapa versi bagus dari plot cluster yang tersedia di beberapa paket R. Sa
 
 ```{r}
 res.fcm2 <- ppclust2(res.fcm, "kmeans")
-factoextra::fviz_cluster(res.fcm2, data = x, 
+factoextra::fviz_cluster(res.fcm2, data = data, 
   ellipse.type = "convex",
   palette = "jco",
   repel = TRUE)
@@ -318,7 +325,7 @@ Pengguna juga dapat menggunakan fungsi clusplot dalam paket 'cluster' (Maechler 
 ```{r}
 res.fcm3 <- ppclust2(res.fcm, "fanny")
 
-cluster::clusplot(scale(x), res.fcm3$cluster,  
+cluster::clusplot(scale(data), res.fcm3$cluster,  
   main = "Cluster plot of Iris data set",
   color=TRUE, labels = 2, lines = 2, cex=1)
 ```
@@ -361,9 +368,6 @@ cat("Fuzzy Silhouette Index: ", idxsf)
 ```
 
 
-
-
-
 # Referensi
 
-1.
+https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html#1_preparing_for_the_analysis
