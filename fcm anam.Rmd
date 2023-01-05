@@ -366,14 +366,4 @@ cat("Fuzzy Silhouette Index: ", idxsf)
 
 # Referensi
 
-Anderson, E. (1935). The irises of the GASPE peninsula, in Bull. Amer. Iris Soc., 59: 2-5.
-
-Bezdek, J.C. (1974). Cluster validity with fuzzy sets. J. Cybern., 3: 58-73.
-
-Bezdek J.C. (1981). . Plenum, NY. https://isbnsearch.org/isbn/0306406713
-
-Ferraro, M.B. & Giordani, P. (2015). A toolbox for fuzzy clustering using the R programming language. Fuzzy Sets and Systems, 279, 1-16. http://dx.doi.org/10.1016/j.fss.2015.05.001
-
-Kassambara, A. & Mundt, F. (2017). factoextra: Extract and Visualize the Results of Multivariate Data Analyses. R package version 1.0.5. https://CRAN.R-project.org/package=factoextra
-
-Maechler, M., Rousseeuw, P., Struyf, A., Hubert, M. & Hornik, K.(2017). cluster: Cluster Analysis Basics and Extensions. R package version 2.0.6. https://CRAN.R-project.org/package=cluster
+1.
