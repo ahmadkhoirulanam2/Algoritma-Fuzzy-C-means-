@@ -85,33 +85,134 @@ urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
 
 ## 1.1.3 Menampilan dataset
 
-Kami menampilkan data FCm dari dataset Iris. Inilah data Iris nyata dari empat fitur diantaranya adalah (Sepal.Length, Sepal.Width, Petal.Length dan Petal.Width) dari 150 bunga iris dengan tiga spesies (di kolom terakhir sebagai variabel kelas). Kumpulan empat data diatas berisi 50 sampel yang masing-masing sampel terdiri dari tiga spesies iris. Salah satu dari tiga cluster alami ini (Kelas 1) secara linier terpisah dengan baik dari dua cluster lainnya, sedangkan Kelas 2 dan 3 memiliki beberapa tumpang tindih seperti yang terlihat pada plot di bawah ini.
 
 ```{r}
+library (readr)
+urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
+
 data<-read.csv(url(urlfile), row.names = "Kabupaten")
 data
 ```
 
 
 
+Menampilakan 6 data awal data Kabupaten
+```{r}
+head(data)
+```
+
+
+
+Menampilkan 6 data akhir data Kabupaten
+
+```{r}
+tail(data)
+```
+
+
+
+Dari data kabupaten saya akan mengambil 5 data awal dari data Kabupaten
+```{r}
+data[1:5, ]
+```
+
 
 
 Mengecek data missing
 ```{r}
 colSums(is.na(data))
+data [1:5, ]
 ```
 
 
-# 2. PENGELOMPOKAN C-MEANS FUZZY
-Fuzzy C-Means (FCM) adalah algoritma soft custering yang diusulkan oleh Bezdek (1974; 1981). Tidak seperti algoritma K-means di mana setiap objek data adalah anggota dari hanya satu cluster, objek data adalah anggota dari semua cluster dengan berbagai tingkat anggota fuzzy antara 0 dan 1 di FCM. Oleh karena itu, objek data yang lebih dekat ke pusat cluster memiliki tingkat keanggotaan yang lebih tinggi daripada objek yang tersebar di perbatasan cluster.
 
-## 2.1 Jalankan FCM dengan Single Start
+# Menampilkan scatterplot matriks/berpasangan
 
-## 2.1.1 Inisialisasi
-Untuk memulai FCM serta algoritme pengoptimalan bergantian lainnya, diperlukan langkah inisialisasi untuk membangun matriks prototipe cluster awal dan matriks derajat keanggotaan fuzzy. Meskipun tugas ini biasanya dilakukan pada langkah inisialisasi dari algoritma pengelompokan, prototipe awal dan keanggotaan juga dapat langsung diinput oleh pengguna.
+```{r}
+pairs(data, col=data[ ,5])
+```
 
-FCM biasanya dimulai dengan menggunakan bilangan bulat yang menentukan jumlah cluster. Dalam hal ini, matriks prototipe dihasilkan secara internal dengan menggunakan salah satu dari algoritma inisialisasi prototipe yang termasuk dalam paket 'inaparc'. Teknik inisialisasi default adalah K-means++ dengan versi fungsi FCM saat ini dalam paket ini. Dalam blok kode berikut, FCM berjalan untuk tiga klaster dengan nilai default dari argumen yang tersisa.
 
+
+# Melihat informasi lebih banyak mengenai mean, median, max
+```{r}
+summary(data)
+```
+
+
+# Melihat korelasi antar atribut
+```{r}
+cor(data)
+```
+dilihat dari data diatas adalah korelasi antar semua adalah searah yaitu ketika yang satu naik maka yang lainnya ikut naik pula dan semakin mendekati 1 maka korelasiny akan semakin kuat dan ketika nilainya mendekati 0 maka nilai korelasinya akan semakin lemah.
+
+
+# Melakukan Clustering FCm 
+
+```{r}
+res.fcm=fcm(data, centers = 3)
+```
+
+data diatas belum muncul karena datanya belum dipanggil
+
+
+
+# Melihat hasil clustering
+
+```{r}
+summary(res.fcm)
+```
+
+Jumlah data Kabupaten adalah 35 dan aku mengcluster sebanyak 3.
+Membership degrees matrix (top and bottom 5 rows) yang aku ambil dari hasil running adalah member degree atau derajat keanggotaannya kerika ada drajat keanggotaanya paling tinggi maka dapat diambil angka paling tinggi.
+
+
+
+
+# Melihat hasil cluster dalam bentuk scatter plot perpasangan
+
+```{r}
+plotcluster(res.fcm, cp=3, trans=TRUE)
+```
+
+-> keterangan diatas cp itu artinya calor atau tema warna
+-> angkat 3 itu merubah warnanya
+-> trans adalah tranparan atau warnanya transparan
+
+
+
+
+# Melihat hasil clustering dalam bentuk plot
+
+
+Kita definisikan terlebih dahulu
+```{r}
+res.fcm2=ppclust2(res.fcm, "kmeans")
+```
+
+```{r}
+res.fcm2 <- ppclust2(res.fcm, "kmeans")
+factoextra::fviz_cluster(res.fcm2, data = data, 
+  ellipse.type = "convex",
+  palette = "jco",
+  repel = TRUE)
+```
+
+
+
+# Validasi FCm
+
+```{r}
+res.fcm3 <- ppclust2(res.fcm, "fanny")
+
+cluster::clusplot(scale(data), res.fcm3$cluster,  
+  main = "Cluster plot of Iris data set",
+  color=TRUE, labels = 2, lines = 1, cex=1)
+```
+
+
+
+# Membuat Matriks Jarak
 
 ```{r}
 #Plot Disatance
@@ -123,251 +224,13 @@ fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4
 
 
 
-Meskipun ini adalah cara biasa untuk menjalankan FCM dengan jumlah cluster yang telah ditentukan sebelumnya, kadang-kadang pengguna mungkin ingin menggunakan matriks prototipe cluster tertentu untuk memulai algoritma. Dalam hal ini, FCM menggunakan matriks prototipe yang ditentukan pengguna alih-alih yang dihasilkan secara internal sebagai berikut:
 
-```{r}
-#use several different values of k
-k2 <- kmeans(data, centers = 2, nstart = 25)
-k3 <- kmeans(data, centers = 3, nstart = 25)
-k4 <- kmeans(data, centers = 4, nstart = 25)
-k5 <- kmeans(data, centers = 5, nstart = 25) 
-```
 
 
-```{r}
-library(gridExtra)
-grid.arrange(p1, p2, p3, p4, p5 nrow = 1)
-```
 
 
-Dalam blok kode berikut, ada contoh lain untuk inisialisasi prototipe cluster untuk tiga cluster. v, matriks prototipe cluster diinisialisasi dengan menggunakan algoritma initalisasi K-means++ (kmpp) dalam paket R 'inaparc'.
-
-
-
-```{r}
-v0 <- inaparc::kmpp(data, k=3)$v
-print(v0)
-```
-
-
-
-
-```{r}
-res.fcm <- fcm(data, centers=v0)
-```
-
-
-Dan masih ada banyak lagi teknik lain untuk inisialisasi matriks prototipe cluster dalam paket R 'inaparc'. Lihat dokumentasi paket untuk alternatif lain.
-
-
-
-FCM dapat dimulai dengan matriks gelar keanggotaan yang ditentukan pengguna. Dalam hal ini, fungsi FCM dipanggil dengan keanggotaan argumen sebagai berikut:
-
-```{r}
-u0 <- inaparc::imembrand(nrow(x), k=3)$u
-res.fcm <- fcm(data, centers=3, memberships=u0)
-```
-
-
-
-Untuk menghasilkan matriks prototipe cluster dan gelar keanggotaan, pengguna dapat memilih salah satu algoritma inisialisasi yang ada dalam paket R 'inaparc'. Untuk tujuan ini, alginitv dan alginitu dapat disedot untuk prototipe cluster dan gelar keanggotaan, masing-masing.
-
-
-```{r}
-res.fcm <- fcm(data, centers = 3, alginitv = "hartiganwong", alginitu = "imembrand") 
-```
-
-
-Secara umum, metrik jarak Euclidean kuadrat digunakan dengan FCM untuk menghitung jarak antara pusat kluster dan objek data. Pengguna dapat menentukan metrik jarak lainnya dengan argumen dmetric sebagai berikut:
-
-```{r}
-res.fcm <- fcm(data, centers=3, dmetric="correlation")
-```
-
-
-
-Meskipun argumen m, eksponen fuzzy biasanya dipilih sebagai 2 di sebagian besar aplikasi yang menggunakan FCM, pengguna dapat meningkatkan m untuk mendapatkan hasil yang lebih kabur sebagai berikut:
-
-
-```{r}
-res.fcm <- fcm(data, centers = 3, m = 4)
-```
-
-Ada argumen input lain yang tersedia dengan fungsi fcm untuk mengontrol jalannya algoritm FCM. Untuk detailnya, lihat fcm di manual paket ppclust.
-
-
-## 2.1.2 Hasil Pengelompokan
-
-## 2.1.2.1 Matriks Keanggotaan Fuzzy
-
-Matriks derajat keanggotaan fuzzy adalah output utama dari fungsi fcm.
-
-```{r}
-res.fcm <- fcm(data, centers=3)
-as.data.frame(res.fcm$u)
-```
-
-
-## 2.1.2.2 Prototipe Cluster Awal dan Akhir
-Matriks prototipe cluster awal dan akhir dapat dicapai sebagai berikut:
-
-```{r}
-res.fcm$v0
-```
-
-```{r}
-res.fcm$v
-```
-
-
-## 2.1.2.3 Ringkasan Hasil Pengelompokan
-
-Fungsi fcm mengembalikan hasil pengelompokan sebagai intance dari kelas 'ppclust'. Objek ini diringkas dengan metode ringkasan paket 'ppclust' sebagai berikut:
-
-```{r}
-summary(res.fcm)
-```
-
-Semua komponen yang tersedia dari objek 'ppclust' tercantum di akhir ringkasan. Elemen-elemen ini dapat diakses menggunakan sebagai atribut objek. Misalnya, waktu eksekusi menjalankan FCM diakses sebagai berikut:
-
-
-```{r}
-res.fcm$comp.time
-```
-
-
-## 2.2 Jalankan FCM dengan Beberapa Awal
-Untuk menemukan solusi optimal, fungsi FCM dapat dimulai beberapa kali. Seperti yang terlihat dalam potongan kode berikut, argumen nstart digunakan untuk tujuan ini.
-
-```{r}
-res.fcm <- fcm(data, centers=3, nstart=5)
-```
-
-
-Ketika beberapa awal dilakukan, baik prototipe cluster awal atau derajat keanggotaan awal dapat diinginkan untuk tetap tidak berubah di antara awal algoritma. Dalam hal ini, argumen fixcent dan fixmemb digunakan untuk memperbaiki matriks prototipe cluster awal dan matriks derajat keanggotaan awal, masing-masing.
-
-
-```{r}
-res.fcm <- fcm(data, centers=3, nstart=5, fixmemb=TRUE)
-```
-
-Dari  data diatas, baik prototipe dan keanggotaan tidak dapat diperbaiki secara bersamaan.
-
-## 2.2.1 
-Menampilkan hasil terbaik yang berisi tentang output yang memberikan informasi seperti fungsi objektif, jumlah iterasi dan waktu komputasi yang diperoleh dengan setiap awal algoritma. Potongan kode berikut menunjukkan output ini.
-
-
-```{r}
-res.fcm$func.val
-```
-
-```{r}
-res.fcm$iter
-```
-
-```{r}
-res.fcm$comp.time
-```
-
-Di antara output yang sukses melakukan codingan, solusinya adalah memberikan nilai minimum dari fungsi objektif, dan dapat disimpan sebagai hasil pengelompokan akhir dari beberapa kategoti awal FCM.
-
-```{r}
-res.fcm$best.start
-```
-
-
-## 2.2.2 Menampilkan ringkasan hasil pengelompokan
-
-Seperti yang dijelaskan untuk satu awal FCM di atas, hasil dari beberapa awal FCM ditampilkan dengan menggunakan metode ringkasan dari paket 'ppclust'.
-
-
-```{r}
-summary(res.fcm)
-```
-
-
-# 3. VISUALISASI HASIL PENGELOMPOKAN
-
-
-## 3.1 Plot Sebar Berpasangan
-Ada banyak cara representasi visual dari hasil pengelompokan. Salah satu teknologi umum adalah menampilkan hasil pengelompokan dengan menggunakan pasangan fitur. 'Plotcluster' dapat digunakan untuk memplot hasil clustering sebagai berikut:
-
-
-```{r}
-plotcluster(res.fcm, cp=1, trans=TRUE)
-```
-
-
-Pada plot di atas, hasil clustering ditunjukkan dengan plot sebar berpasangan dengan menggunakan palet warna 1 dan warna transparan. Detailnya dapat dilihat pada manual paket untuk fungsi 'plotcluster'.
-
-
-
-## 3.2 Plot Cluster dengan fviz_cluster
-
-Ada beberapa versi bagus dari plot cluster yang tersedia di beberapa paket R. Salah satunya adalah fungsi fviz_cluster dari paket 'factoextra' (Kassambara & Mundt, 2017). Untuk menggunakan fungsi ini untuk hasil pengelompokan fuzzy, pertama-tama objek pengelompokan fuzzy ppclust harus dikonversi menjadi objek kmeans dengan menggunakan ppclust2 dari paket 'ppclust' seperti yang ditunjukkan pada baris pertama potongan kode sebagai berikut:
-
-
-
-```{r}
-res.fcm2 <- ppclust2(res.fcm, "kmeans")
-factoextra::fviz_cluster(res.fcm2, data = data, 
-  ellipse.type = "convex",
-  palette = "jco",
-  repel = TRUE)
-```
-
-
-## 3.3 Plot Cluster dengan clusplot
-
-Pengguna juga dapat menggunakan fungsi clusplot dalam paket 'cluster' (Maechler et al, 2017) untuk merencanakan hasil clustering. Untuk tujuan ini, objek pengelompokan fuzzy ppclust harus dikonversi menjadi objek fanny dengan menggunakan fungsi ppclust2 dari paket 'ppclust' seperti yang terlihat pada potongan kode berikut.
-
-
-```{r}
-res.fcm3 <- ppclust2(res.fcm, "fanny")
-
-cluster::clusplot(scale(data), res.fcm3$cluster,  
-  main = "Cluster plot of Iris data set",
-  color=TRUE, labels = 2, lines = 2, cex=1)
-```
-
-
-#### 4. VALIDASI HASIL CLUSTERING
-
-Validasi cluster merupakan proses evaluasi atas kebaikan hasil clustering. Untuk tujuan ini, berbagai indeks validitas telah diusulkan dalam literatur terkait. Karena clustering adalah analisis pembelajaran tanpa pengawasan yang tidak menggunakan informasi eksternal, indeks internal digunakan untuk memvalidasi hasil clustering. Meskipun ada banyak indeks internal yang awalnya diusulkan untuk bekerja dengan gelar keanggotaan keras yang dihasilkan oleh K-means dan variannya, sebagian besar indeks ini tidak dapat digunakan untuk hasil pengelompokan fuzzy. Di lingkungan R, Partition Entropy (PE), Partition Coefficient (PC) dan Modified Partition Coefficient (MPC) dan Fuzzy Silhouette Index tersedia dalam paket 'fclust' (Ferraro & Giordani, 2015), dan dapat digunakan sebagai berikut:
-
-```{r}
-res.fcm4 <- ppclust2 (res.fcm, "fclust")
-idxsf <- SIL.F(res.fcm4$Xca, res.fcm4$U, alpha=1)
-idxpe <- PE(res.fcm4$U)
-idxpc <- PC(res.fcm4$U)
-idxmpc <- MPC(res.fcm4$U)
-```
-
-
-
-
-```{r}
-cat("Partition Entropy: ", idxpe)
-```
-
-
-```{r}
-cat("Partition Coefficient: ", idxpc)
-```
-
-
-
-```{r}
-cat("Modified Partition Coefficient: ", idxmpc)
-```
-
-
-
-```{r}
-cat("Fuzzy Silhouette Index: ", idxsf)
-```
 
 
 # Referensi
-
 https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html#1_preparing_for_the_analysis
+https://rpubs.com/dedenistiawan/K-Means
