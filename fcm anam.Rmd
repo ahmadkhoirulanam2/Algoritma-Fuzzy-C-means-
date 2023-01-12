@@ -61,14 +61,16 @@ Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, ma
 
 # 1. Analisis Kluster Pemartisian Menggunakan Fuzzy C-Means
 
-## 1.1.1 Menampilkan atau menjalankan perintah 'ppclust' analisi C-Means
+Fuzzy C-Means (FCM) adalah algoritma soft custering yang diusulkan oleh Bezdek (1974; 1981). Tidak seperti algoritma K-means di mana setiap objek data adalah anggota dari hanya satu cluster, objek data adalah anggota dari semua cluster dengan berbagai tingkat anggota fuzzy antara 0 dan 1 di FCM. Oleh karena itu, objek data yang lebih dekat ke pusat cluster memiliki tingkat keanggotaan yang lebih tinggi daripada objek yang tersebar di perbatasan cluster.
+
+## 1.1 Menampilkan atau menjalankan perintah 'ppclust' analisi C-Means
 
 ```{r}
 library(ppclust)
 library (readr)
 ```
 
-## 1.1.2 Memanggil data yang dibutuhkan 
+## 1.2  Memanggil data yang dibutuhkan 
 
 Memanggil hasil pengelompokan, dalam kelompok ini menggunakan fungsi dari fungsi analisis kluster seperti 'cluster', 'fclust' dan 'factoextra'.Maka dapat dilihat sebagai berikut:
 
@@ -83,27 +85,28 @@ urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
 ```
 
 
-## 1.1.3 Menampilan dataset
+# 2. Menjalankan dataset
 
+Pada eksprimen ini algoritma K-Means akan digunakan untuk mengelompokan data kemiskinan di Jawa Tengah yang diambil dari website Tim Percepatan Penanggulangan Kemiskinan (TNP2K) dan saya mengambil data dari saudara Deden Setiawan yaitu data Kabupaten Package readr menyiapkan fungsi read_csv() untuk import data dari file CSV. Pada kasus ini digunakan data Data 40% Kemiskinan di jawa Tengah.
 
 ```{r}
 library (readr)
 urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
 
-data<-read.csv(url(urlfile), row.names = "Kabupaten")
 data
+
 ```
 
 
 
-Menampilakan 6 data awal data Kabupaten
+## 2.1 Mau menampilkan 6 data diawal pada data Kabupaten
 ```{r}
 head(data)
 ```
 
 
 
-Menampilkan 6 data akhir data Kabupaten
+## 2.2 Mau menampilkan 6 data diakhir pada data Kabupaten
 
 ```{r}
 tail(data)
@@ -111,14 +114,16 @@ tail(data)
 
 
 
-Dari data kabupaten saya akan mengambil 5 data awal dari data Kabupaten
+## 2.3 Dari data kabupaten saya akan mengambil 5 data awal dari data Kabupaten
+
 ```{r}
 data[1:5, ]
 ```
 
 
 
-Mengecek data missing
+## 2.4  Mengecek 5 data missing pada data Kabupaten
+
 ```{r}
 colSums(is.na(data))
 data [1:5, ]
@@ -126,7 +131,7 @@ data [1:5, ]
 
 
 
-# Menampilkan scatterplot matriks/berpasangan
+## 2.5 Menampilkan scatterplot matriks/berpasangan
 
 ```{r}
 pairs(data, col=data[ ,5])
@@ -134,30 +139,41 @@ pairs(data, col=data[ ,5])
 
 
 
-# Melihat informasi lebih banyak mengenai mean, median, max
+# 3. Melihat informasi lebih banyak mengenai mean, median, max
+
 ```{r}
 summary(data)
 ```
 
 
-# Melihat korelasi antar atribut
+## 3.1 Melihat korelasi antar atribut
+
+Dilihat dari data diatas adalah korelasi antar semua adalah searah yaitu ketika yang satu naik maka yang lainnya ikut naik pula dan semakin mendekati 1 maka korelasiny akan semakin kuat dan ketika nilainya mendekati 0 maka nilai korelasinya akan semakin lemah.
+
+
 ```{r}
 cor(data)
 ```
-dilihat dari data diatas adalah korelasi antar semua adalah searah yaitu ketika yang satu naik maka yang lainnya ikut naik pula dan semakin mendekati 1 maka korelasiny akan semakin kuat dan ketika nilainya mendekati 0 maka nilai korelasinya akan semakin lemah.
 
 
-# Melakukan Clustering FCm 
+
+# 4. Melakukan Clustering FCM
+
+## 4.1 Memanggil data clustering FCM
+
+Memanggil data FCM
 
 ```{r}
-res.fcm=fcm(data, centers = 3)
+res.fcm=fcm(data, centers = 2)
 ```
 
 data diatas belum muncul karena datanya belum dipanggil
 
 
 
-# Melihat hasil clustering
+## 4.2 Melihat hasil clustering
+
+Setelah memanggil data FCM, lalu dapat dilihat hasil clusteringnya sebagai berikut :
 
 ```{r}
 summary(res.fcm)
@@ -169,7 +185,7 @@ Membership degrees matrix (top and bottom 5 rows) yang aku ambil dari hasil runn
 
 
 
-# Melihat hasil cluster dalam bentuk scatter plot perpasangan
+## 4.3 Melihat hasil cluster dalam bentuk scatter plot perpasangan
 
 ```{r}
 plotcluster(res.fcm, cp=3, trans=TRUE)
@@ -182,10 +198,11 @@ plotcluster(res.fcm, cp=3, trans=TRUE)
 
 
 
-# Melihat hasil clustering dalam bentuk plot
+## 4.4 Melihat hasil clustering dalam bentuk plot
 
 
 Kita definisikan terlebih dahulu
+
 ```{r}
 res.fcm2=ppclust2(res.fcm, "kmeans")
 ```
@@ -200,7 +217,8 @@ factoextra::fviz_cluster(res.fcm2, data = data,
 
 
 
-# Validasi FCm
+# 5 Validasi FCM
+
 
 ```{r}
 res.fcm3 <- ppclust2(res.fcm, "fanny")
@@ -212,7 +230,7 @@ cluster::clusplot(scale(data), res.fcm3$cluster,
 
 
 
-# Membuat Matriks Jarak
+## 5.1 Membuat Matriks Jarak
 
 ```{r}
 #Plot Disatance
