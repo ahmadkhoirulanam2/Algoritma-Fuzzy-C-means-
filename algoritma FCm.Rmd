@@ -1,0 +1,233 @@
+---
+title: "Algoritma Fuzy C-Means"
+author: "Ahmad Khoirul Anam"
+date: "2023-01-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Algoritma
+## Tahapan Algoritma
+
+1. Input Data terlebih dahulu.
+
+2. Inisialisasi menentukan :
+ -Jumlah Cluster(c),
+ -Error terkecil yang diharapkan,
+ -Bobot pangkat (w),
+ -Iterasi awal.
+3. Inisiasikan matriks Pseudo-Partition
+-> Memberikan nirai random pada matriks Fuzzy Pseudo partition dengan syarat antara u (u1), i (u2), dan u (u3) berjumlah satu, ∑uji = 1.
+
+4. Dalam fuzzy clustering, setiap data poin akan diberikan nilai seperti peluang atau bobot untuk masuk pada setiap cluster. Setiap data poin yang memiliki jarang paling dekat dengan suatu pusat cluster, akan memiliki nilai yang lebih tinggi untuk masuk ke cluster tersebut dibandingkan dengan cluster lain. Nilai yang diberikan untuk setiap data poin menjadi bagian suatu cluster berkisar dalam rentang 0 hingga 1 seperti nilai probabilitas.
+
+5. Pengulangan
+-> Langkah-langkah :
+u1*(a1),  u1*(a2),  u1*(a3),  u1*(a4),  u1*(a5)
+ u2*(a1),  u2*(a2),  u2*(a3),  u2*(a4),  u2*(a5).
+Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, maka pengulangan langkah ini masih berlanjut.
+
+5. Hitunglah nilai centroid dari masih – masih Cluster.
+
+6. Hitunglah Kembali matriks Fuzzy pseudo – partition matriks partisi.
+
+
+#  Eksperiman Algoritma
+
+## 1. Analisis Kluster Pemartisian Menggunakan Fuzzy C-Means
+Fuzzy c-means clustering merupakan suatu metode clustering yang hampir mirip seperti k-means clustering. Karena metode clustering ini mirip dengan k-means clustering, ada yang menyebut metode ini fuzzy k-means clustering. Fuzzy c-means merupakan salah satu jenis soft clustering di mana dalam mengelompokan suatu data, setiap data bisa dimiliki lebih dari satu cluster.
+
+Ada dua jenis clustering yaitu non-fuzzy clustering (hard clustering) dan fuzzy clustering (soft clustering). Perbedaan yang paling mendasar diantara dua jenis clustering tersebut adalah dalam non-fuzzy clustering (hard custering), setiap data akan dibagi menjadi dalam beberapa kelompok dan setiap data poin hanya dapat dimiliki dalam 1 cluster saja. Berbeda dengan fuzzy clustering (soft clustering), setiap data poin memiliki kesempatan untuk dimiliki oleh lebih dari 1 cluster.
+
+Fuzzy C-Means (FCM) adalah algoritma soft custering yang diusulkan oleh Bezdek (1974; 1981). Tidak seperti algoritma K-means di mana setiap objek data adalah anggota dari hanya satu cluster, objek data adalah anggota dari semua cluster dengan berbagai tingkat anggota fuzzy antara 0 dan 1 di FCM. Oleh karena itu, objek data yang lebih dekat ke pusat cluster memiliki tingkat keanggotaan yang lebih tinggi daripada objek yang tersebar di perbatasan cluster.
+## 1.1 Menampilkan atau menjalankan perintah 'ppclust' analisi C-Means
+
+```{r}
+library(ppclust)
+library (readr)
+```
+
+## 1.2  Memanggil data yang dibutuhkan 
+
+Memanggil hasil pengelompokan, dalam kelompok ini menggunakan fungsi analisis kluster seperti 'cluster', 'fclust' dan 'factoextra'.Maka dapat dilihat sebagai berikut:
+
+```{r}
+library(factoextra)
+library(cluster)
+library(fclust)
+library(ggplot2)
+library (readr)
+library(psych)
+```
+
+
+# 2. Menjalankan Perintah FCM
+
+## 2.1 Menampilkan data Iris lengkap
+
+```{r}
+data=iris
+data
+```
+
+## 2.2 Menghilangkan data 'Species' di data Iris
+
+```{r}
+data(iris)
+data=iris[,-5]
+data
+```
+
+
+## 2.3 Memeriksa Missing Value dari data Iris
+
+```{r}
+colSums(is.na(data))
+```
+Dari data diatas, data Sepal.Length,  Sepal.Width,  Sepal.Length,  Sepal.Width adalah tidak ada masalah apapun atau data tersebut 0.
+
+
+## 2.4 Mau menampilkan 6 data Iris diawal
+
+```{r}
+head(data)
+```
+
+Data diatas dapat saya ambil 6 data diawal dari data Iris, dengan jumlah keseluruhan data berjumlah 150 data Iris.
+
+
+## 2.5 Mau menampilkan 6 data diakhir pake data Iris
+
+```{r}
+tail(data)
+```
+
+Data diatas dapat saya ambil 6 data diakhir dari data Iris, dengan jumlah keseluruhan data berjumlah 150 data Iris.
+
+
+## 2.6 Plot data Iris
+
+```{r}
+pairs(data, col=iris[,1])
+```
+
+
+
+# 3. Melihat korelasi menggunakan data Iris
+
+```{r}
+cor(data)
+```
+
+Dari hasil korelasi diatas korelasi antar Sepal.width dengan Sepal.Length yaitu -0,1175698 , artinya semisal datanya negatif berbanding terbalik yang angka 1 nilainya bertambah yang lainnya nilainya turun dan semisal data nilainnya positif maka hasilnya searah yang satu naik yang lainnya juga ikut naik. Dan nilainya semakin mendekati 1, maka nilainya akan semakin kuat dan semakin mendekati 0, maka nilai korelasinya akan semakin lemah. 
+
+
+
+## 3.1 Melihat boxplot data Iris
+
+```{r}
+boxplot(data)
+```
+
+# 4. Inisialisasi Data
+
+## 4.1 Memanggil data Iris dengan menentukan nilai cetroid dan menampilkan cluster=4
+
+```{r}
+res.fcm <- fcm(data, centers=4)
+```
+
+
+```{r}
+as.data.frame(res.fcm$u)[1:5,]
+```
+
+
+
+## 4.2 Inisial Cluster awal
+
+```{r}
+res.fcm$v0
+```
+
+```{r}
+res.fcm$v
+```
+
+
+```{r}
+summary(res.fcm)
+```
+
+
+## 4.3 Mencari Mean, Median, Modus, dan Quartil
+
+```{r}
+summary(data)
+```
+
+
+
+# 5. Jalankan FCM dengan Step by step
+
+```{r}
+library(ppclust)
+res.fcm <- fcm(data, centers=4, nstart=5)
+
+res.fcm$func.val
+```
+
+
+```{r}
+res.fcm$iter
+```
+
+```{r}
+res.fcm$best.start
+```
+
+
+## 5.1 Menampilkan ringkasan hasil pengelompokan FCM dari data Iris
+
+```{r}
+summary(res.fcm)
+```
+
+
+
+
+# 6. Cluster Plot
+
+```{r}
+plotcluster(res.fcm, cp=2, trans=TRUE)
+```
+
+
+```{r}
+res.fcm2 <- ppclust2(res.fcm, "kmeans")
+factoextra::fviz_cluster(res.fcm2, data = data, 
+  ellipse.type = "convex",
+  palette = "jco",
+  repel = TRUE)
+```
+
+
+```{r}
+boxplot(data)
+```
+
+
+
+
+
+# Referensi
+
+https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html#32_cluster_plot_with_fviz_cluster
+
+https://rpubs.com/dedenistiawan/K-Means
+
+

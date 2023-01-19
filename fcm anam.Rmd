@@ -80,12 +80,10 @@ library(cluster)
 library(fclust)
 library(ggplot2)
 library (readr)
-library (readr)
-urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
 ```
 
 
-# 2. Menjalankan dataset
+# 2. Menjalankan datasetnan
 
 Pada eksprimen ini algoritma K-Means akan digunakan untuk mengelompokan data kemiskinan di Jawa Tengah yang diambil dari website Tim Percepatan Penanggulangan Kemiskinan (TNP2K) dan saya mengambil data dari saudara Deden Setiawan yaitu data Kabupaten Package readr menyiapkan fungsi read_csv() untuk import data dari file CSV. Pada kasus ini digunakan data Data 40% Kemiskinan di jawa Tengah.
 
@@ -93,20 +91,25 @@ Pada eksprimen ini algoritma K-Means akan digunakan untuk mengelompokan data kem
 library (readr)
 urlfile = "https://raw.githubusercontent.com/dedenistiawan/Dataset/main/BDT.csv"
 
+data<-read.csv(url(urlfile), row.names = "Kabupaten")
 data
-
 ```
 
 
 
-## 2.1 Mau menampilkan 6 data diawal pada data Kabupaten
+## 2.1 Mau menampilkan 6 data diawal pada data Swiss
+
+Menampilkan 6 data Swiss diawal
+
 ```{r}
 head(data)
 ```
 
 
 
-## 2.2 Mau menampilkan 6 data diakhir pada data Kabupaten
+## 2.2 Mau menampilkan 6 data diakhir pada data Swiss
+
+Menampilkan 6 data akhir di data Swiss
 
 ```{r}
 tail(data)
@@ -114,7 +117,9 @@ tail(data)
 
 
 
-## 2.3 Dari data kabupaten saya akan mengambil 5 data awal dari data Kabupaten
+## 2.3 Dari data Swiss, saya akan mengambil 5 data awal dari data Swiss
+
+Mau melihat dan menjalankan 5 anggota data Swiss
 
 ```{r}
 data[1:5, ]
@@ -122,7 +127,8 @@ data[1:5, ]
 
 
 
-## 2.4  Mengecek 5 data missing pada data Kabupaten
+## 2.4  Mengecek 5 data missing pada data Swiss
+
 
 ```{r}
 colSums(is.na(data))
@@ -134,12 +140,14 @@ data [1:5, ]
 ## 2.5 Menampilkan scatterplot matriks/berpasangan
 
 ```{r}
-pairs(data, col=data[ ,5])
+pairs(data, col=iris[,2])
 ```
 
 
 
 # 3. Melihat informasi lebih banyak mengenai mean, median, max
+
+Menjalankan hasil min, median, mean, dan max dari data Swiss
 
 ```{r}
 summary(data)
@@ -161,13 +169,16 @@ cor(data)
 
 ## 4.1 Memanggil data clustering FCM
 
-Memanggil data FCM
+
 
 ```{r}
-res.fcm=fcm(data, centers = 2)
+v0 <- matrix(nrow=3, ncol=4,
+     c(5.0, 3.4, 1.4, 0.3,
+       6.7, 3.0, 5.6, 2.1,
+       5.8, 2.7, 4.3, 1.4),
+       byrow=FALSE)
+print(v0)
 ```
-
-data diatas belum muncul karena datanya belum dipanggil
 
 
 
@@ -175,11 +186,8 @@ data diatas belum muncul karena datanya belum dipanggil
 
 Setelah memanggil data FCM, lalu dapat dilihat hasil clusteringnya sebagai berikut :
 
-```{r}
-summary(res.fcm)
-```
 
-Jumlah data Kabupaten adalah 35 dan aku mengcluster sebanyak 3.
+Jumlah data Kabupaten adalah 150 dan aku mengcluster sebanyak 2.
 Membership degrees matrix (top and bottom 5 rows) yang aku ambil dari hasil running adalah member degree atau derajat keanggotaannya kerika ada drajat keanggotaanya paling tinggi maka dapat diambil angka paling tinggi.
 
 
@@ -188,7 +196,7 @@ Membership degrees matrix (top and bottom 5 rows) yang aku ambil dari hasil runn
 ## 4.3 Melihat hasil cluster dalam bentuk scatter plot perpasangan
 
 ```{r}
-plotcluster(res.fcm, cp=3, trans=TRUE)
+plotcluster(res.fcm, cp=2, trans=TRUE)
 ```
 
 -> keterangan diatas cp itu artinya calor atau tema warna
@@ -201,18 +209,13 @@ plotcluster(res.fcm, cp=3, trans=TRUE)
 ## 4.4 Melihat hasil clustering dalam bentuk plot
 
 
-Kita definisikan terlebih dahulu
-
-```{r}
-res.fcm2=ppclust2(res.fcm, "kmeans")
-```
 
 ```{r}
 res.fcm2 <- ppclust2(res.fcm, "kmeans")
-factoextra::fviz_cluster(res.fcm2, data = data, 
+factoextra::fviz_cluster(res.fcm2, data = x, 
   ellipse.type = "convex",
   palette = "jco",
-  repel = TRUE)
+  repel = FALSE)
 ```
 
 

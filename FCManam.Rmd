@@ -1,0 +1,72 @@
+---
+title: "Algoritma Fuzzy C-Means dengan R"
+author: "Ahmad Khoirul Anam"
+date: "2023-01-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Algoritma
+# Tahapan Algoritma
+
+1. Input Data terlebih dahulu.
+
+2. Inisialisasi menentukan :
+ -Jumlah Cluster(c),
+ -Error terkecil yang diharapkan,
+ -Bobot pangkat (w),
+ -Iterasi awal.
+3. Inisiasikan matriks Pseudo-Partition
+-> Memberikan nirai random pada matriks Fuzzy Pseudo partition dengan syarat antara u (u1), i (u2), dan u (u3) berjumlah satu, ∑uji = 1.
+
+4. Pengulangan
+-> Langkah-langkah :
+u1*(a1),  u1*(a2),  u1*(a3),  u1*(a4),  u1*(a5)
+ u2*(a1),  u2*(a2),  u2*(a3),  u2*(a4),  u2*(a5).
+Jika perubahan pada nilai fungsi objektif masih di atas nilai error terkecil, maka pengulangan langkah ini masih berlanjut.
+
+5. Hitunglah nilai centroid dari masih – masih Cluster.
+
+6. Hitunglah Kembali matriks Fuzzy pseudo – partition matriks partisi.
+
+
+#  Eksperiman Algoritma
+
+# 1. Analisis Kluster Pemartisian Menggunakan Fuzzy C-Means
+
+Fuzzy C-Means (FCM) adalah algoritma soft custering yang diusulkan oleh Bezdek (1974; 1981). Tidak seperti algoritma K-means di mana setiap objek data adalah anggota dari hanya satu cluster, objek data adalah anggota dari semua cluster dengan berbagai tingkat anggota fuzzy antara 0 dan 1 di FCM. Oleh karena itu, objek data yang lebih dekat ke pusat cluster memiliki tingkat keanggotaan yang lebih tinggi daripada objek yang tersebar di perbatasan cluster.
+
+## 1.1 Menampilkan atau menjalankan perintah 'ppclust' analisi C-Means
+
+```{r}
+library(ppclust)
+library (readr)
+
+```
+
+
+## 1.2  Memanggil data yang dibutuhkan 
+
+Memanggil hasil pengelompokan, dalam kelompok ini menggunakan fungsi dari fungsi analisis kluster seperti 'cluster', 'fclust' dan 'factoextra'.Maka dapat dilihat sebagai berikut:
+
+```{r}
+library(factoextra)
+library(cluster)
+library(fclust)
+library(ggplot2)
+library (readr)
+```
+
+
+# 2. Menjalankan Perintah FCM
+
+## 2.1 Menampilkan data Iris lengkap
+
+```{r}
+data=iris
+data
+```
+
